@@ -2,39 +2,276 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Generador de Códigos QR</title>
   <style>
+    /* Reset y variables */
+    :root {
+      --primary: #0071e3;
+      --primary-dark: #004a99;
+      --background: #000000;
+      --surface: #1d1d1f;
+      --text-primary: #f5f5f7;
+      --gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      background-color: #f4f4f4;
+      background: var(--background);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
     }
+    
+    /* Fondo dinámico */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      right: -50%;
+      bottom: -50%;
+      background: 
+        radial-gradient(circle at 70% 20%, rgba(28, 133, 238, 0.705) 0%, transparent 30%),
+        radial-gradient(circle at 30% 80%, rgba(37, 59, 82, 0.788) 0%, transparent 30%);
+      z-index: -1;
+      animation: float 20s infinite linear;
+    }
+    
+    @keyframes float {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-5%, 5%) rotate(2deg); }
+      50% { transform: translate(5%, -3%) rotate(-2deg); }
+      75% { transform: translate(-3%, 4%) rotate(3deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    
+
+
+
+
+
+
+
+
+
+
+
+/* Marquee Watermark: agrega este código a tu CSS sin afectar otras reglas */
+.watermark {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  transform: translateY(-50%);
+  font-size: 8rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: rgba(18, 18, 80, 0.247);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: -2;
+  animation: watermarkMarquee 100s linear infinite;
+}
+
+@keyframes watermarkMarquee {
+  0% {
+    transform: translateX(0) translateY(-50%);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-50%);
+  }
+}
+
+
+
+
+
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
+      backdrop-filter: blur(20px);
     }
-    input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
+    
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      text-align: center;
+      margin: 4rem 0;
+      background: linear-gradient(135deg, #fff 20%, #0071e3 100%);
+      -webkit-background-clip: text;
+background-clip: text;
+
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 15px rgba(0, 113, 227, 0.2);
+      letter-spacing: -1.5px;
     }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
+    
+    #qrForm {
+      max-width: 700px;
+      margin: 0 auto 4rem;
+      display: flex;
+      gap: 1.5rem;
+      position: relative;
+    }
+    
+    #textInput {
+      flex: 1;
+      padding: 1.25rem 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      font-size: 1.1rem;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    #textInput::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    #textInput:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.2);
+    }
+    
+    button[type="submit"] {
+      padding: 1.25rem 3rem;
+      background: var(--gradient);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
     }
+    
+    button[type="submit"]::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    button[type="submit"]:hover::after {
+      left: 100%;
+    }
+    
+    button[type="submit"]:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 113, 227, 0.4);
+    }
+    
+    #result {
+      max-width: 320px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+    }
+    
     #qrImage {
-      margin-top: 1rem;
-      max-width: 100%;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      transition: transform 0.3s ease;
     }
-  </style>
-</head>
+    
+    #qrImage:hover {
+      transform: scale(1.03);
+    }
+    
+    /* Efectos especiales */
+    .glow {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 60%);
+      filter: blur(80px);
+      z-index: -1;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        margin: 2rem auto;
+      }
+      
+      h1 {
+        font-size: 2.25rem;
+        margin: 3rem 0;
+      }
+      
+      #qrForm {
+        flex-direction: column;
+      }
+      
+      button[type="submit"] {
+        width: 100%;
+        padding: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      #textInput {
+        padding: 1rem 1.5rem;
+      }
+      
+      #result {
+        max-width: 280px;
+      }
+    }
+    
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #result {
+      animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Mensajes de error */
+    [style*="color:red"] {
+      padding: 1.5rem;
+      background: rgba(255, 50, 50, 0.1);
+      border: 1px solid rgba(255, 50, 50, 0.2);
+      border-radius: 12px;
+      margin: 2rem 0;
+      backdrop-filter: blur(8px);
+    }
+    </style>
 <body>
   <div class="container">
     <h1>Generador de Códigos QR</h1>
@@ -46,7 +283,10 @@
       <!-- Aquí se mostrará la imagen del QR -->
     </div>
   </div>
-
+  <div class="watermark">
+    Antonio Gutierrez   •   Antonio Gutierrez   •
+  </div>
+  
   <script>
     // Seleccionamos el formulario y el contenedor donde se mostrará el QR
     const form = document.getElementById('qrForm');
