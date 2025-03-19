@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generador de Códigos QR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #qrImage {
+      margin-top: 1rem;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Generador de Códigos QR</h1>
+    <form id="qrForm">
+      <input type="text" id="textInput" placeholder="Ingresa el texto o URL" required>
+      <button type="submit">Generar QR</button>
+    </form>
+    <div id="result">
+      <!-- Aquí se mostrará la imagen del QR -->
+    </div>
+  </div>
+
+  <script>
+    // Seleccionamos el formulario y el contenedor donde se mostrará el QR
+    const form = document.getElementById('qrForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Evitamos el envío tradicional del formulario
+      const text = document.getElementById('textInput').value.trim();
+
+      if (!text) {
+        alert("Por favor, ingresa algún texto o URL.");
+        return;
+      }
+
+      try {
+        // Hacemos la solicitud al endpoint /api/generate con el parámetro text
+        const response = await fetch(`/api/generate?text=${encodeURIComponent(text)}`);
+        const data = await response.json();
+
+        if (data.error) {
+          resultDiv.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+          return;
+        }
+
+        // Creamos una etiqueta img y le asignamos el Data URL
+        resultDiv.innerHTML = `<img id="qrImage" src="${data.qr}" alt="Código QR">`;
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color:red;">Ocurrió un error al generar el código QR.</p>`;
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
